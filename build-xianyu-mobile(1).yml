@@ -1,0 +1,54 @@
+name: Build Xianyu Mobile APK
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "xianyu-mobile/**"
+      - ".github/workflows/build-xianyu-mobile.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: xianyu-mobile/package-lock.json
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+        with:
+          accept-android-sdk-licenses: true
+
+      - name: Install JavaScript dependencies
+        working-directory: xianyu-mobile
+        run: npm ci
+
+      - name: Build release APK
+        working-directory: xianyu-mobile/android
+        run: |
+          chmod +x ./gradlew
+          ./gradlew assembleRelease --no-daemon
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: xianyu-mobile-release-apk
+          path: xianyu-mobile/android/app/build/outputs/apk/release/*.apk
+          if-no-files-found: error
+          retention-days: 14
