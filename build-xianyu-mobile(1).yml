@@ -1,3 +1,4 @@
+
 name: Build Xianyu Mobile APK
 
 on:
@@ -13,6 +14,7 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout source
         uses: actions/checkout@v4
@@ -35,7 +37,7 @@ jobs:
         with:
           accept-android-sdk-licenses: true
 
-      - name: Install JavaScript dependencies
+      - name: Install dependencies
         working-directory: xianyu-mobile
         run: npm ci
 
